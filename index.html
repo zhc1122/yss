@@ -1,0 +1,1182 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>学信档案 - Demo</title>
+
+  <style>
+    .brand{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      margin-top:18px; /* 你可微调 */
+    }
+    .brand img{
+      width:38px;      /* 图标大小可调 */
+      height:38px;
+      object-fit:contain;
+    }
+    .brand .brand-text{
+      font-size:32px;  /* 文字大小按你原来的 */
+      font-weight:800;
+      letter-spacing:.2px;
+    }
+
+    :root{
+      --green:#26b37a;
+      --green2:#2fc08a;
+      --bg:#f5f6f7;
+      --text:#1f2328;
+      --muted:#8b949e;
+      --card:#ffffff;
+      --shadow: 0 10px 24px rgba(0,0,0,.08);
+    }
+
+    *{
+      box-sizing:border-box;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body{
+      margin:0;
+      font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",Helvetica,Arial,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      font-weight:400;
+    }
+
+    a{color:inherit;text-decoration:none}
+
+    .app{
+      max-width:480px;
+      margin:0 auto;
+      min-height:100vh;
+      background:var(--bg);
+    }
+
+    /* ---------------------------
+       Common Topbar
+    ---------------------------- */
+    .topbar{
+      background:var(--green);
+      color:#fff;
+      padding: calc(env(safe-area-inset-top) + 12px) 14px 14px;
+      position:sticky;
+      top:0;
+      z-index:10;
+    }
+    .topbar-row{
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .back-btn{
+      width:36px;height:36px;
+      display:grid;place-items:center;
+      border-radius:10px;
+      background:rgba(255,255,255,.18);
+      border:1px solid rgba(255,255,255,.25);
+      cursor:pointer;
+      flex:0 0 auto;
+    }
+    .back-btn:active{transform:scale(.98)}
+    .topbar h1{
+      margin:0;
+      font-size:18px;
+      font-weight:700;
+      letter-spacing:.2px;
+      flex:1;
+      text-align:center;
+      padding-right:36px; /* 视觉居中 */
+    }
+
+    .content{
+      padding:14px;
+      padding-bottom: calc(env(safe-area-inset-bottom) + 18px);
+    }
+
+    /* ---------------------------
+       Router
+    ---------------------------- */
+    /* ---------------------------
+      Router (关键修复：页面覆盖式，不再上下堆叠)
+    ---------------------------- */
+    .app{
+      position: relative;
+      overflow: hidden;        /* 防止滑出看到下一页 */
+      min-height: 100vh;
+    }
+
+    /* 所有 page 叠在一起，只有 active 的显示 */
+    .page{
+      position: absolute;
+      inset: 0;                /* top/right/bottom/left = 0 */
+      display: none;
+      overflow-y: auto;        /* 页面内部滚动 */
+      -webkit-overflow-scrolling: touch;
+      background: var(--bg);
+    }
+
+    .page.active{
+      display: block;
+    }
+
+
+    /* ---------------------------
+       Page Login (图1)
+    ---------------------------- */
+    .login-wrap{
+      padding:22px 16px 28px;
+    }
+    .logo{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      margin-top:16px;
+      margin-bottom:30px;
+    }
+    .logo-badge{
+      width:44px;height:30px;
+      border-radius:8px;
+      background:linear-gradient(135deg,#2fc08a,#2b9c70);
+      position:relative;
+      overflow:hidden;
+    }
+    .logo-badge::before{
+      content:"";
+      position:absolute;
+      width:60px;height:60px;
+      border-radius:50%;
+      background:rgba(255,255,255,.25);
+      right:-25px; top:-25px;
+    }
+    .logo-title{
+      font-size:26px;
+      font-weight:800;
+      letter-spacing:.5px;
+      color:#2b2f36;
+    }
+    .login-sub{
+      text-align:center;
+      color:#6b7280;
+      font-size:16px;
+      margin:0 0 16px;
+    }
+    .form{
+      margin-top:18px;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+    .input{
+      width:100%;
+      padding:16px 14px;
+      border-radius:10px;
+      border:1px solid #d1d5db;
+      outline:none;
+      font-size:18px;
+      background:#fff;
+    }
+    .input:focus{
+      border-color: rgba(38,179,122,.75);
+      box-shadow: 0 0 0 4px rgba(38,179,122,.12);
+    }
+    .login-btn{
+      margin-top:12px;
+      width:100%;
+      border:none;
+      background:#5bb889;
+      color:#fff;
+      font-weight:800;
+      font-size:18px;
+      border-radius:10px;
+      padding:14px 16px;
+      cursor:pointer;
+    }
+    .login-btn:active{transform:scale(.99)}
+    .login-links{
+      display:flex;
+      justify-content:space-between;
+      margin-top:16px;
+      font-size:16px;
+      color:#6b7280;
+      padding:0 2px;
+    }
+    .login-footer{
+      margin-top:34px;
+      padding-top:14px;
+      border-top:1px solid #eef0f2;
+      text-align:center;
+      color:#9aa1aa;
+      font-size:13px;
+      line-height:1.6;
+    }
+    .login-footer .nav{
+      display:flex;
+      justify-content:center;
+      gap:26px;
+      margin-bottom:10px;
+      color:#6b7280;
+      font-size:15px;
+    }
+
+    /* ---------------------------
+       Page Portal (图2)
+    ---------------------------- */
+    .portal-topbar{
+      background:var(--green);
+      color:#fff;
+      padding: calc(env(safe-area-inset-top) + 12px) 14px 14px;
+      position:sticky;
+      top:0;
+      z-index:10;
+    }
+    .portal-row{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+    }
+    .portal-row .exit{
+      position:absolute;
+      right:0;
+      width:36px;height:36px;
+      display:grid;place-items:center;
+      border-radius:10px;
+      background:rgba(255,255,255,.18);
+      border:1px solid rgba(255,255,255,.25);
+      cursor:pointer;
+    }
+    .portal-title{
+      font-size:18px;
+      font-weight:800;
+      letter-spacing:.4px;
+    }
+
+    .portal-card{
+      background:#fff;
+      border-radius:14px;
+      box-shadow:0 6px 16px rgba(0,0,0,.06);
+      padding:14px;
+      margin-top:14px;
+    }
+    .portal-recommend{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+    }
+    .portal-recommend .left{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      min-width:0;
+    }
+    .portal-recommend .left .t{
+      font-size:20px;
+      font-weight:800;
+    }
+    .portal-recommend .left .sub{
+      color:#6b7280;
+      font-size:14px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      max-width:280px;
+    }
+    .portal-recommend .right{
+      display:flex;
+      flex-direction:column;
+      align-items:flex-end;
+      gap:8px;
+      flex:0 0 auto;
+    }
+    .badge{
+      font-size:13px;
+      color:#8b5cf6;
+      background:#f3e8ff;
+      border-radius:999px;
+      padding:4px 10px;
+      font-weight:700;
+    }
+    .go-btn{
+      border:none;
+      border-radius:999px;
+      background:#2fb27a;
+      color:#fff;
+      font-weight:800;
+      padding:10px 14px;
+      cursor:pointer;
+    }
+
+    .portal-banner{
+      margin-top:14px;
+      background:linear-gradient(90deg,#cfe9ff,#e7f3ff);
+      border-radius:14px;
+      padding:14px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      box-shadow:0 6px 16px rgba(0,0,0,.06);
+    }
+    .portal-banner .b1{
+      font-size:22px;
+      font-weight:900;
+      color:#1d4ed8;
+      line-height:1.1;
+    }
+    .portal-banner .b2{
+      margin-top:6px;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      font-size:14px;
+      font-weight:800;
+      color:#1d4ed8;
+      background:rgba(29,78,216,.12);
+      padding:6px 10px;
+      border-radius:8px;
+    }
+
+    .grid{
+      margin-top:14px;
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:18px 12px;
+      padding:10px 4px 0;
+    }
+    .grid-item{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:10px;
+      cursor:pointer;
+      user-select:none;
+    }
+    .grid-icon{
+      width:46px;height:46px;
+      border-radius:14px;
+      background:#eef2ff;
+      display:grid;place-items:center;
+      box-shadow:0 6px 14px rgba(0,0,0,.06);
+    }
+    .grid-item span{
+      font-size:14px;
+      color:#111827;
+      text-align:center;
+      line-height:1.25;
+    }
+
+    .bottom-nav{
+      position:sticky;
+      bottom:0;
+      background:#fff;
+      border-top:1px solid #eef0f2;
+      padding:10px 10px calc(env(safe-area-inset-bottom) + 10px);
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .nav-item{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:6px;
+      font-size:12px;
+      color:#9aa1aa;
+    }
+    .nav-item.active{
+      color:var(--green);
+      font-weight:800;
+    }
+
+    /* ---------------------------
+       Your existing pages
+    ---------------------------- */
+    .section{
+      margin:14px 0 18px;
+    }
+    .section-head{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      margin:0 2px 10px;
+      gap:10px;
+    }
+    .section-title{
+      font-size:18px;
+      font-weight:700;
+      letter-spacing:.2px;
+    }
+    .section-help{
+      font-size:13px;
+      color:#6b7280;
+      white-space:nowrap;
+    }
+    .section-help a{
+      color:var(--green);
+      font-weight:600;
+    }
+
+    .edu-card{
+      background:linear-gradient(90deg,var(--green),var(--green2));
+      border-radius:18px;
+      color:#fff;
+      padding:18px 18px;
+      box-shadow: var(--shadow);
+      position:relative;
+      overflow:hidden;
+      min-height:118px;
+      display:flex;
+      align-items:center;
+    }
+    .edu-card .row{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      width:100%;
+    }
+    .edu-card .row > div:first-child{
+      flex:1;
+      min-width:0;
+    }
+
+    .edu-card .school{
+      font-size:24px;
+      font-weight:700;
+      margin:0 0 10px;
+      line-height:1.15;
+      letter-spacing:.2px;
+    }
+    .edu-card .meta{
+      font-size:15px;
+      font-weight:400;
+      opacity:.95;
+      line-height:1.5;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .pill{
+      background:rgba(255,255,255,.16);
+      border:1px solid rgba(255,255,255,.22);
+      padding:6px 12px;
+      border-radius:999px;
+      font-size:14px;
+      font-weight:600;
+      white-space:nowrap;
+      margin-top:2px;
+    }
+
+    .tap-hint{
+      margin-top:10px;
+      font-size:13px;
+      font-weight:400;
+      opacity:.75;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .tap-hint .dot{
+      width:6px;height:6px;border-radius:50%;
+      background:rgba(255,255,255,.9);
+    }
+
+    .info-card{
+      background:var(--card);
+      border-radius:18px;
+      box-shadow: 0 6px 16px rgba(0,0,0,.06);
+      padding:16px;
+    }
+    .empty-title{
+      font-size:22px;
+      font-weight:800;
+      text-align:center;
+      margin:8px 0 12px;
+      letter-spacing:.2px;
+    }
+    .center{
+      display:flex;
+      justify-content:center;
+      align-items:center;
+    }
+    .link-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      padding:10px 14px;
+      border-radius:999px;
+      border:1px solid #e5e7eb;
+      background:#fff;
+      color:var(--green);
+      font-weight:700;
+      cursor:pointer;
+    }
+    .link-btn:active{transform:scale(.99)}
+    .muted{
+      color:#6b7280;
+      font-size:13px;
+      text-align:center;
+      line-height:1.55;
+      margin:0;
+    }
+
+    .banner{
+      background:linear-gradient(90deg,#dfe7ff,#f1e6ff);
+      border-radius:18px;
+      padding:14px;
+      box-shadow: 0 6px 16px rgba(0,0,0,.06);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .banner .t1{
+      font-size:20px;
+      font-weight:800;
+      color:#2b2f36;
+      margin:0;
+    }
+    .banner .t2{
+      margin:6px 0 0;
+      color:#4b5563;
+      font-size:13px;
+      line-height:1.4;
+    }
+    .illus{
+      width:84px;height:56px;
+      border-radius:14px;
+      background:rgba(255,255,255,.65);
+      display:grid;place-items:center;
+      flex:0 0 auto;
+      border:1px solid rgba(0,0,0,.05);
+    }
+
+    .profile-card{
+      margin-top:12px;
+      background:linear-gradient(90deg,var(--green),var(--green2));
+      border-radius:18px;
+      color:#fff;
+      padding:16px;
+      box-shadow: var(--shadow);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .profile-top{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      position:relative;
+      z-index:1;
+    }
+    .avatar{
+      width:62px;height:78px;
+      border-radius:10px;
+      background:rgba(255,255,255,.15);
+      border:1px solid rgba(255,255,255,.25);
+      display:grid;place-items:center;
+      overflow:hidden;
+      flex:0 0 auto;
+    }
+    .avatar small{
+      font-size:12px;
+      opacity:.9;
+      display:block;
+      text-align:center;
+      padding:6px;
+    }
+    .avatar img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+    }
+
+    .name{
+      font-size:24px;
+      font-weight:700;
+      margin:0 0 6px;
+      letter-spacing:.2px;
+    }
+    .subline{
+      opacity:.92;
+      font-size:15px;
+      font-weight:400;
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin:0;
+    }
+
+    .profile-school{
+      margin-top:14px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      position:relative;
+      z-index:1;
+    }
+    .profile-school .s1{
+      font-size:26px;
+      font-weight:800;
+      margin:0;
+      letter-spacing:.2px;
+    }
+    .profile-school .s2{
+      margin:6px 0 0;
+      opacity:.95;
+      font-size:15px;
+      font-weight:400;
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .kv-card{
+      margin-top:12px;
+      background:#fff;
+      border-radius:18px;
+      padding:10px 14px;
+      box-shadow: 0 6px 16px rgba(0,0,0,.06);
+    }
+    .kv{
+      display:grid;
+      grid-template-columns: 1fr 1.55fr;
+      gap:0;
+      padding:12px 4px;
+      border-bottom:1px solid #f0f1f2;
+      align-items:center;
+    }
+    .kv:last-child{border-bottom:none}
+
+    .k{
+      color:#9aa1aa;
+      font-size:15px;
+      font-weight:400;
+    }
+    .v{
+      color:#111827;
+      font-size:17px;
+      font-weight:600;
+      letter-spacing:.2px;
+      text-align:left;
+      word-break:break-all;
+    }
+
+    .primary-btn{
+      margin-top:14px;
+      width:100%;
+      border:none;
+      background:var(--green);
+      color:#fff;
+      font-weight:800;
+      font-size:18px;
+      border-radius:14px;
+      padding:14px 16px;
+      box-shadow: 0 10px 20px rgba(38,179,122,.25);
+      cursor:pointer;
+    }
+    .primary-btn:active{transform:scale(.99)}
+
+        /* 登录页整体容器：自适应上下间距 */
+    #page-login{
+      display:flex;
+      justify-content:center;
+    }
+
+    /* 登录内容区 */
+    .login-wrap{
+      width: 100%;
+      max-width: 420px;
+      margin: 0 auto;
+
+      /* 关键：纵向排列 + 自动间距 */
+      display: flex;
+      flex-direction: column;
+
+      /* 控制整体上下留白（自适应） */
+      padding: clamp(26px, 6vh, 56px) 18px 22px;
+
+      /* 关键：统一控制模块间距 */
+      gap: clamp(14px, 2.6vh, 26px);
+    }
+
+    /* logo + 标题 */
+    .brand{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:12px;
+      margin-top: 0; /* 交给 gap 控制 */
+    }
+    .brand img{
+      width: 44px;
+      height: 44px;
+      object-fit: contain;
+    }
+    .brand-text{
+      font-size: 42px;
+      font-weight: 900;
+      letter-spacing: .2px;
+    }
+
+    /* 副标题 */
+    .login-sub{
+      margin: 0;
+      text-align: center;
+      font-size: 18px;
+      color: #6b7280;
+      letter-spacing: .2px;
+    }
+
+    /* 表单区：输入框和按钮之间也用 gap */
+    .form{
+      display:flex;
+      flex-direction:column;
+      gap: 16px;
+      margin-top: 6px;
+    }
+
+    /* 输入框高度更接近原版 */
+    .input{
+      height: 64px;
+      font-size: 18px;
+      padding: 0 18px;
+      border-radius: 14px;
+    }
+
+    /* 登录按钮 */
+    .login-btn{
+      height: 66px;
+      border-radius: 14px;
+      font-size: 22px;
+      font-weight: 800;
+      margin-top: 6px;
+    }
+
+    /* 找回密码 / 注册 */
+    .login-links{
+      display:flex;
+      justify-content:space-between;
+      margin-top: 2px;
+      font-size: 18px;
+      color: #6b7280;
+    }
+
+    /* 底部信息：自动靠下（自适应） */
+    .login-footer{
+      margin-top: auto; /* 关键：把 footer 推到页面底部 */
+      padding-top: 10px;
+    }
+
+    /* 底部导航 */
+    .login-footer .nav{
+      display:flex;
+      justify-content:center;
+      gap: 28px;
+      color:#6b7280;
+      font-size: 16px;
+    }
+
+  </style>
+</head>
+
+<body>
+  <div class="app">
+
+    <!-- PAGE A: Login -->
+    <section id="page-login" class="page active" aria-label="学信档案-登录">
+      <div class="login-wrap">
+        <div class="brand">
+        <img src="./xuexin.png" alt="学信档案" />
+        <div class="brand-text">学信档案</div>
+        </div>
+
+
+        <p class="login-sub">请使用 学信网账号 进行登录</p>
+
+        <div class="form">
+          <input class="input" id="login-account" placeholder="请输入账号" value="" />
+          <input class="input" id="login-password" placeholder="密码" type="password" />
+
+          <button class="login-btn" onclick="doLogin()">登录</button>
+        </div>
+
+        <div class="login-links">
+          <a href="javascript:void(0)" onclick="toast('找回密码（示例）')">找回密码</a>
+          <a href="javascript:void(0)" onclick="toast('注册（示例）')">注册</a>
+        </div>
+
+        <div class="login-footer">
+          <div class="nav">
+            <span>首页</span>
+            <span>帮助中心</span>
+            <span>联系我们</span>
+          </div>
+          Copyright © 2003-2026 学信网 All Rights Reserved
+        </div>
+      </div>
+    </section>
+
+    <!-- PAGE B: Portal -->
+    <section id="page-portal" class="page" aria-label="学信档案-首页">
+      <header class="portal-topbar">
+    <div class="portal-row">
+      <!-- 左侧返回 -->
+      <button class="back-btn" aria-label="返回" onclick="goto('#/login')" style="position:absolute;left:0;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+          <path d="M15 18l-6-6 6-6" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+      <div class="portal-title">学信档案</div>
+
+    </div>
+  </header>
+
+
+      <main class="content">
+        <div class="portal-card portal-recommend">
+          <div class="left">
+            <div class="t">专业推荐</div>
+            <div class="sub">南开大学—电子科学与技术</div>
+          </div>
+          <div class="right">
+            <div class="badge">累计投票 1572</div>
+            <button class="go-btn" onclick="toast('去推荐（示例）')">去推荐</button>
+          </div>
+        </div>
+
+        <div class="portal-banner">
+          <div>
+            <div class="b1">高校校园学习状况调查</div>
+            <div class="b2">立即前往 ▶</div>
+          </div>
+          <div style="width:86px;height:56px;border-radius:12px;background:rgba(255,255,255,.75);display:grid;place-items:center;border:1px solid rgba(0,0,0,.06);">
+            🏫
+          </div>
+        </div>
+
+        <div class="grid">
+          <div class="grid-item" onclick="goto('#/home')">
+            <div class="grid-icon">🎓</div>
+            <span>高等教育信息</span>
+          </div>
+          <div class="grid-item" onclick="toast('在线验证报告（示例）')">
+            <div class="grid-icon">🛡️</div>
+            <span>在线验证报告</span>
+          </div>
+          <div class="grid-item" onclick="toast('学历学位认证（示例）')">
+            <div class="grid-icon">📄</div>
+            <span>学历学位认证<br/>与成绩验证</span>
+          </div>
+
+          <div class="grid-item" onclick="toast('出国报告发送（示例）')">
+            <div class="grid-icon">📞</div>
+            <span>出国（境）报告<br/>发送</span>
+          </div>
+          <div class="grid-item" onclick="toast('毕业证书图像校对（示例）')">
+            <div class="grid-icon">👤</div>
+            <span>毕业证书图像<br/>校对</span>
+          </div>
+          <div class="grid-item" onclick="toast('就业（示例）')">
+            <div class="grid-icon">💼</div>
+            <span>就业</span>
+          </div>
+
+          <div class="grid-item" onclick="toast('学校满意度（示例）')">
+            <div class="grid-icon">🙂</div>
+            <span>学校满意度</span>
+          </div>
+          <div class="grid-item" onclick="toast('个人测评（示例）')">
+            <div class="grid-icon">📋</div>
+            <span>个人测评</span>
+          </div>
+          <div class="grid-item" onclick="toast('双千计划（示例）')">
+            <div class="grid-icon">🟦</div>
+            <span>“双千”计划<br/>“微专业”</span>
+          </div>
+        </div>
+      </main>
+
+      <div class="bottom-nav">
+        <div class="nav-item active">🏠<div>首页</div></div>
+        <div class="nav-item">🎓<div>学籍学历学位</div></div>
+        <div class="nav-item">📋<div>个人测评</div></div>
+        <div class="nav-item">🧳<div>求职招聘</div></div>
+        <div class="nav-item">👤<div>我的</div></div>
+      </div>
+    </section>
+
+    <!-- PAGE 1: Your Home -->
+    <section id="page-home" class="page" aria-label="高等教育信息-首页">
+      <header class="topbar">
+        <div class="topbar-row">
+          <button class="back-btn" aria-label="返回" title="返回" onclick="goBack()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M15 18l-6-6 6-6" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <h1>高等教育信息</h1>
+        </div>
+      </header>
+
+      <main class="content">
+        <div class="section">
+          <div class="section-head">
+            <div class="section-title">学籍信息（1）</div>
+            <div class="section-help">还有学籍没有显示出来？ <a href="javascript:void(0)">尝试绑定</a></div>
+          </div>
+
+          <a class="edu-card" href="#/detail" role="button" aria-label="进入学籍信息详情">
+            <div class="row">
+              <div>
+                <div class="school">南开大学</div>
+                <div class="meta">
+                  <span>电子信息科学与技术</span>
+                  <span style="opacity:.8">｜</span>
+                  <span>普通全日制</span>
+                </div>
+                <div class="tap-hint">
+                  <span class="dot"></span><span>点击查看详情</span>
+                </div>
+              </div>
+              <div class="pill">本科</div>
+            </div>
+          </a>
+        </div>
+
+        <div class="section">
+          <div class="section-head">
+            <div class="section-title">学历信息</div>
+            <div class="section-help">还有学历没有显示出来？ <a href="javascript:void(0)">尝试绑定</a></div>
+          </div>
+
+          <div class="info-card">
+            <div class="empty-title">没有找到您的学历信息</div>
+            <div class="center">
+              <button class="link-btn" onclick="toast('这里可跳转到“查看解决办法”')">
+                查看解决办法
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M9 6l6 6-6 6" stroke="#26b37a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-head">
+            <div class="section-title">学位信息</div>
+            <div class="section-help">还有学位没有显示出来？ <a href="javascript:void(0)">尝试绑定</a></div>
+          </div>
+
+          <div class="info-card">
+            <div class="empty-title" style="font-size:20px;font-weight:800">您还未绑定学位信息，可以使用“尝试绑定学位”功能绑定您的学位</div>
+            <div class="center" style="margin-top:6px">
+              <button class="link-btn" onclick="toast('这里可跳转到“提示信息”')">
+                提示信息
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M9 6l6 6-6 6" stroke="#26b37a" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-head">
+            <div class="section-title">考研信息</div>
+          </div>
+
+          <div class="info-card">
+            <div class="empty-title" style="font-weight:800">您没有考研信息！</div>
+            <p class="muted">
+              您目前没有考研信息，系统提供2006年以来入学的硕士研究生报名和成绩数据。
+            </p>
+          </div>
+        </div>
+      </main>
+    </section>
+
+    <!-- PAGE 2: Your Detail -->
+    <section id="page-detail" class="page" aria-label="学籍详情页">
+      <header class="topbar">
+        <div class="topbar-row">
+          <button class="back-btn" aria-label="返回" title="返回" onclick="goBack()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M15 18l-6-6 6-6" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <h1>高等学籍</h1>
+        </div>
+      </header>
+
+      <main class="content">
+        <div class="banner">
+          <div>
+            <p class="t1">职场实习</p>
+            <p class="t2">反馈实习困惑、实战心得与建议，帮大家实习少走弯路</p>
+          </div>
+          <div class="illus" aria-hidden="true">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+              <path d="M4 18h16" stroke="#6b7280" stroke-width="2" stroke-linecap="round"/>
+              <path d="M7 17V8a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v9" stroke="#6b7280" stroke-width="2" stroke-linecap="round"/>
+              <path d="M9 10h6" stroke="#6b7280" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="profile-card">
+          <div class="profile-top">
+            <div class="avatar" title="录取照片">
+              <img src="./admission.jpg" alt="录取照片"
+                onerror="this.style.display='none'; this.parentElement.innerHTML='<small>录取照片</small>';">
+            </div>
+
+            <div class="avatar" title="学历照片" style="background:rgba(255,255,255,.10)">
+              <small>学历照片</small>
+            </div>
+
+            <div style="flex:1; position:relative; z-index:1;">
+              <p class="name">张海成</p>
+              <p class="subline">
+                <span>男</span>
+                <span>1999年11月22日</span>
+              </p>
+            </div>
+          </div>
+
+          <div class="profile-school">
+            <div>
+              <p class="s1">南开大学</p>
+              <p class="s2">
+                <span>电子科学与技术</span>
+                <span style="opacity:.8">｜</span>
+                <span>全日制</span>
+              </p>
+            </div>
+            <div class="pill">本科</div>
+          </div>
+        </div>
+
+        <div class="kv-card">
+          <div class="kv"><div class="k">民族</div><div class="v">汉族</div></div>
+          <div class="kv"><div class="k">证件号码</div><div class="v">371423199911225019</div></div>
+          <div class="kv"><div class="k">学制</div><div class="v">4 年</div></div>
+          <div class="kv"><div class="k">学历类别</div><div class="v">普通高等教育</div></div>
+          <div class="kv"><div class="k">分院</div><div class="v">电子信息与光学工程学院</div></div>
+          <div class="kv"><div class="k">系所</div><div class="v">—</div></div>
+          <div class="kv"><div class="k">班级</div><div class="v">—</div></div>
+          <div class="kv"><div class="k">学号</div><div class="v">1120220209</div></div>
+          <div class="kv"><div class="k">入学日期</div><div class="v">2022年09月06日</div></div>
+          <div class="kv"><div class="k">学籍状态</div><div class="v">在籍（注册学籍）</div></div>
+          <div class="kv"><div class="k">预计毕业日期</div><div class="v">2026年06月30日</div></div>
+        </div>
+
+        <button class="primary-btn" onclick="toast('这里可打开“验证报告”（示例中用提示代替）')">
+          查看验证报告
+        </button>
+
+      </main>
+    </section>
+
+  </div>
+
+  <script>
+    // ---------------------------
+    // Router: 4 pages
+    // ---------------------------
+    const pages = {
+      login: document.getElementById('page-login'),
+      portal: document.getElementById('page-portal'),
+      home: document.getElementById('page-home'),
+      detail: document.getElementById('page-detail')
+    };
+
+    function goto(hash){
+      location.hash = hash;
+    }
+
+    function renderRoute() {
+      const hash = location.hash || "#/login";
+      const route = hash.replace("#/", "");
+
+      Object.values(pages).forEach(p => p.classList.remove("active"));
+
+      if (route === "portal") pages.portal.classList.add("active");
+      else if (route === "home") pages.home.classList.add("active");
+      else if (route === "detail") pages.detail.classList.add("active");
+      else pages.login.classList.add("active");
+    }
+
+    // Back button behavior:
+    // Use history back when possible; if not, fallback to routing.
+    function goBack() {
+      // 如果有历史记录，就直接返回上一页（保证“前进/后退”符合浏览器逻辑）
+      if (window.history.length > 1) {
+        history.back();
+        return;
+      }
+
+      // fallback
+      const hash = location.hash || "#/login";
+      const route = hash.replace("#/", "");
+      if (route === "detail") goto("#/home");
+      else if (route === "home") goto("#/portal");
+      else if (route === "portal") goto("#/login");
+      else toast("已经在首页");
+    }
+
+    // Login: no matter what, jump to portal
+    function doLogin(){
+      goto("#/portal");
+    }
+
+    window.addEventListener("hashchange", renderRoute);
+    renderRoute();
+
+    // ---------------------------
+    // Toast
+    // ---------------------------
+    let toastTimer = null;
+    function toast(msg){
+      clearTimeout(toastTimer);
+
+      let t = document.getElementById("toast");
+      if(!t){
+        t = document.createElement("div");
+        t.id = "toast";
+        t.style.position = "fixed";
+        t.style.left = "50%";
+        t.style.bottom = "28px";
+        t.style.transform = "translateX(-50%)";
+        t.style.maxWidth = "92vw";
+        t.style.background = "rgba(0,0,0,.78)";
+        t.style.color = "#fff";
+        t.style.padding = "10px 14px";
+        t.style.borderRadius = "999px";
+        t.style.fontSize = "13px";
+        t.style.zIndex = "9999";
+        t.style.opacity = "0";
+        t.style.transition = "opacity .2s ease";
+        document.body.appendChild(t);
+      }
+      t.textContent = msg;
+      requestAnimationFrame(()=> t.style.opacity = "1");
+      toastTimer = setTimeout(()=> t.style.opacity = "0", 1700);
+    }
+  </script>
+</body>
+</html>
