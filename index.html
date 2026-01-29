@@ -1086,10 +1086,10 @@
     // 照片替换（学籍+录取）
     // ---------------------------
     function pickPhoto(type){
-      // if(!isEditing){
-      //   toast("进入编辑模式后才可替换照片");
-      //   return;
-      // }
+      if(!isEditing){
+        toast("");
+        return;
+      }
       const input = document.getElementById(`file-${type}`);
       if(!input) return;
       input.value = ""; // 允许重复选择同一张
