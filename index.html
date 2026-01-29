@@ -6,24 +6,6 @@
   <title>学信档案 - Demo</title>
 
   <style>
-    .brand{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
-      margin-top:18px; /* 你可微调 */
-    }
-    .brand img{
-      width:38px;      /* 图标大小可调 */
-      height:38px;
-      object-fit:contain;
-    }
-    .brand .brand-text{
-      font-size:32px;  /* 文字大小按你原来的 */
-      font-weight:800;
-      letter-spacing:.2px;
-    }
-
     :root{
       --green:#26b37a;
       --green2:#2fc08a;
@@ -47,15 +29,27 @@
       color:var(--text);
       font-weight:400;
     }
-
     a{color:inherit;text-decoration:none}
 
+    /* Router (关键修复：页面覆盖式，不再上下堆叠) */
     .app{
       max-width:480px;
       margin:0 auto;
-      min-height:100vh;
+      position: relative;
+      overflow: hidden;
+      min-height: 100vh;
       background:var(--bg);
     }
+
+    .page{
+      position:absolute;
+      inset:0;
+      display:none;
+      overflow-y:auto;
+      -webkit-overflow-scrolling:touch;
+      background:var(--bg);
+    }
+    .page.active{display:block;}
 
     /* ---------------------------
        Common Topbar
@@ -72,6 +66,7 @@
       display:flex;
       align-items:center;
       gap:10px;
+      position:relative;
     }
     .back-btn{
       width:36px;height:36px;
@@ -90,7 +85,7 @@
       letter-spacing:.2px;
       flex:1;
       text-align:center;
-      padding-right:36px; /* 视觉居中 */
+      padding-right:36px;
     }
 
     .content{
@@ -99,86 +94,62 @@
     }
 
     /* ---------------------------
-       Router
+       Login page
     ---------------------------- */
-    /* ---------------------------
-      Router (关键修复：页面覆盖式，不再上下堆叠)
-    ---------------------------- */
-    .app{
-      position: relative;
-      overflow: hidden;        /* 防止滑出看到下一页 */
-      min-height: 100vh;
+    #page-login{
+      display:flex;
+      justify-content:center;
     }
 
-    /* 所有 page 叠在一起，只有 active 的显示 */
-    .page{
-      position: absolute;
-      inset: 0;                /* top/right/bottom/left = 0 */
-      display: none;
-      overflow-y: auto;        /* 页面内部滚动 */
-      -webkit-overflow-scrolling: touch;
-      background: var(--bg);
-    }
-
-    .page.active{
-      display: block;
-    }
-
-
-    /* ---------------------------
-       Page Login (图1)
-    ---------------------------- */
     .login-wrap{
-      padding:22px 16px 28px;
+      width: 100%;
+      max-width: 420px;
+      margin: 0 auto;
+      display:flex;
+      flex-direction:column;
+      padding: clamp(26px, 6vh, 56px) 18px 22px;
+      gap: clamp(14px, 2.6vh, 26px);
     }
-    .logo{
+
+    .brand{
       display:flex;
       align-items:center;
       justify-content:center;
-      gap:10px;
-      margin-top:16px;
-      margin-bottom:30px;
+      gap:12px;
+      margin-top:0;
     }
-    .logo-badge{
-      width:44px;height:30px;
-      border-radius:8px;
-      background:linear-gradient(135deg,#2fc08a,#2b9c70);
-      position:relative;
-      overflow:hidden;
+    .brand img{
+      width:44px;height:44px;
+      object-fit:contain;
     }
-    .logo-badge::before{
-      content:"";
-      position:absolute;
-      width:60px;height:60px;
-      border-radius:50%;
-      background:rgba(255,255,255,.25);
-      right:-25px; top:-25px;
+    .brand-text{
+      font-size:42px;
+      font-weight:900;
+      letter-spacing:.2px;
     }
-    .logo-title{
-      font-size:26px;
-      font-weight:800;
-      letter-spacing:.5px;
-      color:#2b2f36;
-    }
+
     .login-sub{
+      margin:0;
       text-align:center;
+      font-size:18px;
       color:#6b7280;
-      font-size:16px;
-      margin:0 0 16px;
+      letter-spacing:.2px;
     }
+
     .form{
-      margin-top:18px;
       display:flex;
       flex-direction:column;
-      gap:14px;
+      gap:16px;
+      margin-top:6px;
     }
     .input{
       width:100%;
-      padding:16px 14px;
-      border-radius:10px;
+      height:64px;
+      font-size:18px;
+      padding:0 18px;
+      border-radius:14px;
       border:1px solid #d1d5db;
       outline:none;
-      font-size:18px;
       background:#fff;
     }
     .input:focus{
@@ -186,30 +157,29 @@
       box-shadow: 0 0 0 4px rgba(38,179,122,.12);
     }
     .login-btn{
-      margin-top:12px;
-      width:100%;
+      height:66px;
+      border-radius:14px;
       border:none;
       background:#5bb889;
       color:#fff;
+      font-size:22px;
       font-weight:800;
-      font-size:18px;
-      border-radius:10px;
-      padding:14px 16px;
+      margin-top:6px;
       cursor:pointer;
     }
     .login-btn:active{transform:scale(.99)}
+
     .login-links{
       display:flex;
       justify-content:space-between;
-      margin-top:16px;
-      font-size:16px;
+      margin-top:2px;
+      font-size:18px;
       color:#6b7280;
-      padding:0 2px;
     }
+
     .login-footer{
-      margin-top:34px;
-      padding-top:14px;
-      border-top:1px solid #eef0f2;
+      margin-top:auto;
+      padding-top:10px;
       text-align:center;
       color:#9aa1aa;
       font-size:13px;
@@ -218,14 +188,14 @@
     .login-footer .nav{
       display:flex;
       justify-content:center;
-      gap:26px;
-      margin-bottom:10px;
+      gap:28px;
       color:#6b7280;
-      font-size:15px;
+      font-size:16px;
+      margin-bottom:10px;
     }
 
     /* ---------------------------
-       Page Portal (图2)
+       Portal page
     ---------------------------- */
     .portal-topbar{
       background:var(--green);
@@ -240,16 +210,6 @@
       align-items:center;
       justify-content:center;
       position:relative;
-    }
-    .portal-row .exit{
-      position:absolute;
-      right:0;
-      width:36px;height:36px;
-      display:grid;place-items:center;
-      border-radius:10px;
-      background:rgba(255,255,255,.18);
-      border:1px solid rgba(255,255,255,.25);
-      cursor:pointer;
     }
     .portal-title{
       font-size:18px;
@@ -397,11 +357,9 @@
     }
 
     /* ---------------------------
-       Your existing pages
+       Home / Detail pages (你的原样式)
     ---------------------------- */
-    .section{
-      margin:14px 0 18px;
-    }
+    .section{margin:14px 0 18px;}
     .section-head{
       display:flex;
       align-items:flex-end;
@@ -409,20 +367,9 @@
       margin:0 2px 10px;
       gap:10px;
     }
-    .section-title{
-      font-size:18px;
-      font-weight:700;
-      letter-spacing:.2px;
-    }
-    .section-help{
-      font-size:13px;
-      color:#6b7280;
-      white-space:nowrap;
-    }
-    .section-help a{
-      color:var(--green);
-      font-weight:600;
-    }
+    .section-title{font-size:18px;font-weight:700;letter-spacing:.2px;}
+    .section-help{font-size:13px;color:#6b7280;white-space:nowrap;}
+    .section-help a{color:var(--green);font-weight:600;}
 
     .edu-card{
       background:linear-gradient(90deg,var(--green),var(--green2));
@@ -443,11 +390,7 @@
       gap:12px;
       width:100%;
     }
-    .edu-card .row > div:first-child{
-      flex:1;
-      min-width:0;
-    }
-
+    .edu-card .row > div:first-child{flex:1;min-width:0;}
     .edu-card .school{
       font-size:24px;
       font-weight:700;
@@ -464,7 +407,6 @@
       gap:10px;
       flex-wrap:wrap;
     }
-
     .pill{
       background:rgba(255,255,255,.16);
       border:1px solid rgba(255,255,255,.22);
@@ -475,7 +417,6 @@
       white-space:nowrap;
       margin-top:2px;
     }
-
     .tap-hint{
       margin-top:10px;
       font-size:13px;
@@ -485,10 +426,7 @@
       align-items:center;
       gap:8px;
     }
-    .tap-hint .dot{
-      width:6px;height:6px;border-radius:50%;
-      background:rgba(255,255,255,.9);
-    }
+    .tap-hint .dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.9);}
 
     .info-card{
       background:var(--card);
@@ -503,11 +441,7 @@
       margin:8px 0 12px;
       letter-spacing:.2px;
     }
-    .center{
-      display:flex;
-      justify-content:center;
-      align-items:center;
-    }
+    .center{display:flex;justify-content:center;align-items:center;}
     .link-btn{
       display:inline-flex;
       align-items:center;
@@ -522,13 +456,7 @@
       cursor:pointer;
     }
     .link-btn:active{transform:scale(.99)}
-    .muted{
-      color:#6b7280;
-      font-size:13px;
-      text-align:center;
-      line-height:1.55;
-      margin:0;
-    }
+    .muted{color:#6b7280;font-size:13px;text-align:center;line-height:1.55;margin:0;}
 
     .banner{
       background:linear-gradient(90deg,#dfe7ff,#f1e6ff);
@@ -540,18 +468,8 @@
       justify-content:space-between;
       gap:10px;
     }
-    .banner .t1{
-      font-size:20px;
-      font-weight:800;
-      color:#2b2f36;
-      margin:0;
-    }
-    .banner .t2{
-      margin:6px 0 0;
-      color:#4b5563;
-      font-size:13px;
-      line-height:1.4;
-    }
+    .banner .t1{font-size:20px;font-weight:800;color:#2b2f36;margin:0;}
+    .banner .t2{margin:6px 0 0;color:#4b5563;font-size:13px;line-height:1.4;}
     .illus{
       width:84px;height:56px;
       border-radius:14px;
@@ -571,7 +489,6 @@
       position:relative;
       overflow:hidden;
     }
-
     .profile-top{
       display:flex;
       gap:12px;
@@ -595,12 +512,7 @@
       text-align:center;
       padding:6px;
     }
-    .avatar img{
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      display:block;
-    }
+    .avatar img{width:100%;height:100%;object-fit:cover;display:block;}
 
     .name{
       font-size:24px;
@@ -659,20 +571,8 @@
       align-items:center;
     }
     .kv:last-child{border-bottom:none}
-
-    .k{
-      color:#9aa1aa;
-      font-size:15px;
-      font-weight:400;
-    }
-    .v{
-      color:#111827;
-      font-size:17px;
-      font-weight:600;
-      letter-spacing:.2px;
-      text-align:left;
-      word-break:break-all;
-    }
+    .k{color:#9aa1aa;font-size:15px;font-weight:400;}
+    .v{color:#111827;font-size:17px;font-weight:600;letter-spacing:.2px;text-align:left;word-break:break-all;}
 
     .primary-btn{
       margin-top:14px;
@@ -689,106 +589,47 @@
     }
     .primary-btn:active{transform:scale(.99)}
 
-        /* 登录页整体容器：自适应上下间距 */
-    #page-login{
-      display:flex;
-      justify-content:center;
+    /* ---------------------------
+       编辑/查看（不显示输入框）
+    ---------------------------- */
+    .editable{
+      display:inline-block;
+      padding:2px 4px;
+      border-radius:6px;
+      outline:none;
+    }
+    /* 编辑模式下给一点点提示（很轻，不像输入框） */
+    .editing .editable{
+      background: rgba(255,255,255,.16);
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.25);
+    }
+    .editing .kv-card .editable{
+      background: rgba(38,179,122,.06);
+      box-shadow: inset 0 0 0 1px rgba(38,179,122,.15);
     }
 
-    /* 登录内容区 */
-    .login-wrap{
-      width: 100%;
-      max-width: 420px;
-      margin: 0 auto;
-
-      /* 关键：纵向排列 + 自动间距 */
-      display: flex;
-      flex-direction: column;
-
-      /* 控制整体上下留白（自适应） */
-      padding: clamp(26px, 6vh, 56px) 18px 22px;
-
-      /* 关键：统一控制模块间距 */
-      gap: clamp(14px, 2.6vh, 26px);
+    /* 编辑模式下：可替换照片的框有一点点提示 */
+    .editing .avatar-editable{
+      outline: 2px dashed rgba(255,255,255,.45);
+      outline-offset: 2px;
+      cursor: pointer;
     }
 
-    /* logo + 标题 */
-    .brand{
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      gap:12px;
-      margin-top: 0; /* 交给 gap 控制 */
+    /* 详情页右上角隐藏小按钮（切换编辑/保存） */
+    .edit-toggle{
+      position:absolute;
+      right:0;
+      width:36px;height:36px;
+      display:grid;place-items:center;
+      border-radius:10px;
+      background:rgba(255,255,255,.18);
+      border:1px solid rgba(255,255,255,.25);
+      cursor:pointer;
+      user-select:none;
+      font-weight:900;
     }
-    .brand img{
-      width: 44px;
-      height: 44px;
-      object-fit: contain;
-    }
-    .brand-text{
-      font-size: 42px;
-      font-weight: 900;
-      letter-spacing: .2px;
-    }
-
-    /* 副标题 */
-    .login-sub{
-      margin: 0;
-      text-align: center;
-      font-size: 18px;
-      color: #6b7280;
-      letter-spacing: .2px;
-    }
-
-    /* 表单区：输入框和按钮之间也用 gap */
-    .form{
-      display:flex;
-      flex-direction:column;
-      gap: 16px;
-      margin-top: 6px;
-    }
-
-    /* 输入框高度更接近原版 */
-    .input{
-      height: 64px;
-      font-size: 18px;
-      padding: 0 18px;
-      border-radius: 14px;
-    }
-
-    /* 登录按钮 */
-    .login-btn{
-      height: 66px;
-      border-radius: 14px;
-      font-size: 22px;
-      font-weight: 800;
-      margin-top: 6px;
-    }
-
-    /* 找回密码 / 注册 */
-    .login-links{
-      display:flex;
-      justify-content:space-between;
-      margin-top: 2px;
-      font-size: 18px;
-      color: #6b7280;
-    }
-
-    /* 底部信息：自动靠下（自适应） */
-    .login-footer{
-      margin-top: auto; /* 关键：把 footer 推到页面底部 */
-      padding-top: 10px;
-    }
-
-    /* 底部导航 */
-    .login-footer .nav{
-      display:flex;
-      justify-content:center;
-      gap: 28px;
-      color:#6b7280;
-      font-size: 16px;
-    }
-
+    .edit-toggle:active{transform:scale(.98)}
+    .edit-toggle span{font-size:16px;line-height:1;}
   </style>
 </head>
 
@@ -799,17 +640,15 @@
     <section id="page-login" class="page active" aria-label="学信档案-登录">
       <div class="login-wrap">
         <div class="brand">
-        <img src="./xuexin.png" alt="学信档案" />
-        <div class="brand-text">学信档案</div>
+          <img src="./xuexin.png" alt="学信档案" />
+          <div class="brand-text">学信档案</div>
         </div>
-
 
         <p class="login-sub">请使用 学信网账号 进行登录</p>
 
         <div class="form">
           <input class="input" id="login-account" placeholder="请输入账号" value="" />
           <input class="input" id="login-password" placeholder="密码" type="password" />
-
           <button class="login-btn" onclick="doLogin()">登录</button>
         </div>
 
@@ -832,19 +671,15 @@
     <!-- PAGE B: Portal -->
     <section id="page-portal" class="page" aria-label="学信档案-首页">
       <header class="portal-topbar">
-    <div class="portal-row">
-      <!-- 左侧返回 -->
-      <button class="back-btn" aria-label="返回" onclick="goto('#/login')" style="position:absolute;left:0;">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-          <path d="M15 18l-6-6 6-6" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </button>
-
-      <div class="portal-title">学信档案</div>
-
-    </div>
-  </header>
-
+        <div class="portal-row">
+          <button class="back-btn" aria-label="返回" onclick="goto('#/login')" style="position:absolute;left:0;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M15 18l-6-6 6-6" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+          <div class="portal-title">学信档案</div>
+        </div>
+      </header>
 
       <main class="content">
         <div class="portal-card portal-recommend">
@@ -863,9 +698,7 @@
             <div class="b1">高校校园学习状况调查</div>
             <div class="b2">立即前往 ▶</div>
           </div>
-          <div style="width:86px;height:56px;border-radius:12px;background:rgba(255,255,255,.75);display:grid;place-items:center;border:1px solid rgba(0,0,0,.06);">
-            🏫
-          </div>
+          <div style="width:86px;height:56px;border-radius:12px;background:rgba(255,255,255,.75);display:grid;place-items:center;border:1px solid rgba(0,0,0,.06);">🏫</div>
         </div>
 
         <div class="grid">
@@ -1002,9 +835,7 @@
 
           <div class="info-card">
             <div class="empty-title" style="font-weight:800">您没有考研信息！</div>
-            <p class="muted">
-              您目前没有考研信息，系统提供2006年以来入学的硕士研究生报名和成绩数据。
-            </p>
+            <p class="muted">您目前没有考研信息，系统提供2006年以来入学的硕士研究生报名和成绩数据。</p>
           </div>
         </div>
       </main>
@@ -1019,7 +850,13 @@
               <path d="M15 18l-6-6 6-6" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
           </button>
+
           <h1>高等学籍</h1>
+
+          <!-- 右上角隐藏小按钮：查看/编辑 -->
+          <button class="edit-toggle" aria-label="编辑/保存" onclick="toggleEdit()">
+            <span id="editIcon"> </span>
+          </button>
         </div>
       </header>
 
@@ -1040,49 +877,62 @@
 
         <div class="profile-card">
           <div class="profile-top">
-            <div class="avatar" title="录取照片">
-              <img src="./admission.jpg" alt="录取照片"
-                onerror="this.style.display='none'; this.parentElement.innerHTML='<small>录取照片</small>';">
+            <!-- 录取照片（可替换） -->
+            <div class="avatar avatar-editable" title="录取照片" onclick="pickPhoto('admission')">
+              <img id="img-admission" src="./admission.jpg" alt="录取照片"
+                   onerror="this.style.display='none'; document.getElementById('txt-admission').style.display='block';">
+              <small id="txt-admission" style="display:none;">录取照片</small>
             </div>
+            <input id="file-admission" type="file" accept="image/*" style="display:none" />
 
-            <div class="avatar" title="学历照片" style="background:rgba(255,255,255,.10)">
-              <small>学历照片</small>
+            <!-- 学籍照片（可替换） -->
+            <div class="avatar avatar-editable" title="学籍照片" onclick="pickPhoto('xueji')"
+                 style="background:rgba(255,255,255,.10)">
+              <img id="img-xueji" src="" alt="学籍照片" style="display:none;">
+              <small id="txt-xueji">学籍照片</small>
             </div>
+            <input id="file-xueji" type="file" accept="image/*" style="display:none" />
 
             <div style="flex:1; position:relative; z-index:1;">
-              <p class="name">张海成</p>
+              <p class="name">
+                <span class="editable" data-key="name">张海成</span>
+              </p>
               <p class="subline">
-                <span>男</span>
-                <span>1999年11月22日</span>
+                <span class="editable" data-key="gender">男</span>
+                <span class="editable" data-key="birth">1999年11月22日</span>
               </p>
             </div>
           </div>
 
           <div class="profile-school">
             <div>
-              <p class="s1">南开大学</p>
+              <p class="s1">
+                <span class="editable" data-key="school">南开大学</span>
+              </p>
               <p class="s2">
-                <span>电子科学与技术</span>
+                <span class="editable" data-key="major">电子科学与技术</span>
                 <span style="opacity:.8">｜</span>
-                <span>全日制</span>
+                <span class="editable" data-key="studyType">全日制</span>
               </p>
             </div>
-            <div class="pill">本科</div>
+            <div class="pill">
+              <span class="editable" data-key="degree">本科</span>
+            </div>
           </div>
         </div>
 
         <div class="kv-card">
-          <div class="kv"><div class="k">民族</div><div class="v">汉族</div></div>
-          <div class="kv"><div class="k">证件号码</div><div class="v">371423199911225019</div></div>
-          <div class="kv"><div class="k">学制</div><div class="v">4 年</div></div>
-          <div class="kv"><div class="k">学历类别</div><div class="v">普通高等教育</div></div>
-          <div class="kv"><div class="k">分院</div><div class="v">电子信息与光学工程学院</div></div>
-          <div class="kv"><div class="k">系所</div><div class="v">—</div></div>
-          <div class="kv"><div class="k">班级</div><div class="v">—</div></div>
-          <div class="kv"><div class="k">学号</div><div class="v">1120220209</div></div>
-          <div class="kv"><div class="k">入学日期</div><div class="v">2022年09月06日</div></div>
-          <div class="kv"><div class="k">学籍状态</div><div class="v">在籍（注册学籍）</div></div>
-          <div class="kv"><div class="k">预计毕业日期</div><div class="v">2026年06月30日</div></div>
+          <div class="kv"><div class="k">民族</div><div class="v"><span class="editable" data-key="nation">汉族</span></div></div>
+          <div class="kv"><div class="k">证件号码</div><div class="v"><span class="editable" data-key="idno">371423199911225019</span></div></div>
+          <div class="kv"><div class="k">学制</div><div class="v"><span class="editable" data-key="years">4 年</span></div></div>
+          <div class="kv"><div class="k">学历类别</div><div class="v"><span class="editable" data-key="eduType">普通高等教育</span></div></div>
+          <div class="kv"><div class="k">分院</div><div class="v"><span class="editable" data-key="college">电子信息与光学工程学院</span></div></div>
+          <div class="kv"><div class="k">系所</div><div class="v"><span class="editable" data-key="dept">—</span></div></div>
+          <div class="kv"><div class="k">班级</div><div class="v"><span class="editable" data-key="class">—</span></div></div>
+          <div class="kv"><div class="k">学号</div><div class="v"><span class="editable" data-key="sid">1120220209</span></div></div>
+          <div class="kv"><div class="k">入学日期</div><div class="v"><span class="editable" data-key="start">2022年09月06日</span></div></div>
+          <div class="kv"><div class="k">学籍状态</div><div class="v"><span class="editable" data-key="status">在籍（注册学籍）</span></div></div>
+          <div class="kv"><div class="k">预计毕业日期</div><div class="v"><span class="editable" data-key="grad">2026年06月30日</span></div></div>
         </div>
 
         <button class="primary-btn" onclick="toast('这里可打开“验证报告”（示例中用提示代替）')">
@@ -1121,16 +971,11 @@
       else pages.login.classList.add("active");
     }
 
-    // Back button behavior:
-    // Use history back when possible; if not, fallback to routing.
     function goBack() {
-      // 如果有历史记录，就直接返回上一页（保证“前进/后退”符合浏览器逻辑）
       if (window.history.length > 1) {
         history.back();
         return;
       }
-
-      // fallback
       const hash = location.hash || "#/login";
       const route = hash.replace("#/", "");
       if (route === "detail") goto("#/home");
@@ -1139,7 +984,6 @@
       else toast("已经在首页");
     }
 
-    // Login: no matter what, jump to portal
     function doLogin(){
       goto("#/portal");
     }
@@ -1153,7 +997,6 @@
     let toastTimer = null;
     function toast(msg){
       clearTimeout(toastTimer);
-
       let t = document.getElementById("toast");
       if(!t){
         t = document.createElement("div");
@@ -1177,6 +1020,128 @@
       requestAnimationFrame(()=> t.style.opacity = "1");
       toastTimer = setTimeout(()=> t.style.opacity = "0", 1700);
     }
+
+    // ---------------------------
+    // 查看/编辑 + 保存（文字）
+    // ---------------------------
+    let isEditing = false;
+
+    function toggleEdit(){
+      isEditing = !isEditing;
+      document.body.classList.toggle("editing", isEditing);
+
+      // 让所有 editable 可编辑/不可编辑
+      document.querySelectorAll(".editable").forEach(el=>{
+        el.contentEditable = isEditing ? "true" : "false";
+      });
+
+      // 图标变化：编辑✎ / 保存✓
+      document.getElementById("editIcon").textContent = isEditing ? " " : " ";
+
+      if(!isEditing){
+        saveDetail();
+        toast("已保存");
+      }else{
+        toast("编辑模式已开启");
+      }
+    }
+
+    function saveDetail(){
+      const data = {};
+      document.querySelectorAll(".editable").forEach(el=>{
+        const key = el.dataset.key;
+        if(key) data[key] = el.textContent.trim();
+      });
+      localStorage.setItem("detail_text", JSON.stringify(data));
+    }
+
+    function loadDetail(){
+      const raw = localStorage.getItem("detail_text");
+      if(!raw) return;
+      try{
+        const data = JSON.parse(raw);
+        document.querySelectorAll(".editable").forEach(el=>{
+          const key = el.dataset.key;
+          if(key && data[key] != null){
+            el.textContent = data[key];
+          }
+        });
+      }catch(e){}
+    }
+
+    // ---------------------------
+    // 照片替换（学籍+录取）
+    // ---------------------------
+    function pickPhoto(type){
+      if(!isEditing){
+        toast("进入编辑模式后才可替换照片");
+        return;
+      }
+      const input = document.getElementById(`file-${type}`);
+      if(!input) return;
+      input.value = ""; // 允许重复选择同一张
+      input.click();
+    }
+
+    document.addEventListener("change", function(e){
+      if(e.target.id === "file-xueji"){
+        handlePhotoFile(e.target.files[0], "xueji");
+      }
+      if(e.target.id === "file-admission"){
+        handlePhotoFile(e.target.files[0], "admission");
+      }
+    });
+
+    function handlePhotoFile(file, type){
+      if(!file) return;
+
+      // 体积限制（localStorage 有上限，防止保存失败）
+      if(file.size > 900 * 1024){
+        toast("图片太大，请换一张更小的（建议 <900KB）");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(){
+        const base64 = reader.result;
+
+        const img = document.getElementById(`img-${type}`);
+        const txt = document.getElementById(`txt-${type}`);
+
+        if(img){
+          img.src = base64;
+          img.style.display = "block";
+        }
+        if(txt) txt.style.display = "none";
+
+        localStorage.setItem(`photo_${type}`, base64);
+        toast("照片已替换");
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function loadPhotos(){
+      ["xueji","admission"].forEach(type=>{
+        const base64 = localStorage.getItem(`photo_${type}`);
+        if(base64){
+          const img = document.getElementById(`img-${type}`);
+          const txt = document.getElementById(`txt-${type}`);
+          if(img){
+            img.src = base64;
+            img.style.display = "block";
+          }
+          if(txt) txt.style.display = "none";
+        }
+      });
+    }
+
+    window.addEventListener("load", ()=>{
+      loadDetail();
+      loadPhotos();
+
+      // 默认查看模式：确保 contentEditable 是关的
+      document.querySelectorAll(".editable").forEach(el=> el.contentEditable = "false");
+    });
   </script>
 </body>
 </html>
